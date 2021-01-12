@@ -59,100 +59,8 @@ public class AssetController {
         response.setHeader(headerKey, headerValue);
 
 
-/*
-        //Making asset to provide input for Output CSV File.
-        Asset asset1 =  Asset.builder().assetName("TTYY889").id(1L).build();
-        /*Each Asset has an assetDetails Set, which includes all of its instances as individual AssetDetail
-        Class Object. This set(assetDetails) will be used for assetDetails attribute of Asset class object * /
-        Set<AssetDetail> assetDetails = new HashSet<>();
-
-        //Creating AssetDetail Objects to insert into assetDetails attribute of Asset Class
-        AssetDetail assetDetail1 = AssetDetail.builder().asset(asset1)
-                .endTime(LocalDateTime.of(2021,01,10,15,34,22))
-                .startTime(LocalDateTime.of(2021, 01, 10, 13, 45, 32))
-                .id(1L)
-                .severity(2)
-                .build();
-
-        AssetDetail assetDetail2 = AssetDetail.builder().asset(asset1)
-                .endTime(LocalDateTime.of(2021,01,10,17,37,22))
-                .startTime(LocalDateTime.of(2021, 01, 10, 16, 45, 32))
-                .id(2L)
-                .severity(3)
-                .build();
-
-        AssetDetail assetDetail3 = AssetDetail.builder().asset(asset1)
-                .endTime(LocalDateTime.of(2021,01,11,15,34,22))
-                .startTime(LocalDateTime.of(2021, 01, 11, 13, 45, 32))
-                .id(3L)
-                .severity(1)
-                .build();
-
-        //Adding the all assetDetail objects to assetDetails Set.
-        assetDetails.add(assetDetail1);
-        assetDetails.add(assetDetail2);
-        assetDetails.add(assetDetail3);
-
-        //Setting assetDetails attribute of asset1 to assetDetails Set declared above.
-        asset1.setAssetDetails(assetDetails);
-        //Saving the asset.
-        assetMapService.save(asset1);
-
-
-        //Repeating the above process for another asset.
-        Asset asset2 =  Asset.builder().assetName("TTYY911").id(2L).build();
-
-        Set<AssetDetail> assetDetails1 = new HashSet<>();
-        AssetDetail assetDetail4 = AssetDetail.builder().asset(asset2)
-                .endTime(LocalDateTime.of(2021,01,10,11,34,22))
-                .startTime(LocalDateTime.of(2021, 01, 10, 9, 45, 32))
-                .id(4L)
-                .severity(1)
-                .build();
-        AssetDetail assetDetail5 = AssetDetail.builder().asset(asset2)
-                .endTime(LocalDateTime.of(2021,01,11,15,34,22))
-                .startTime(LocalDateTime.of(2021, 01, 11, 13, 45, 32))
-                .id(5L)
-                .severity(2)
-                .build();
-        AssetDetail assetDetail6 = AssetDetail.builder().asset(asset2)
-                .endTime(LocalDateTime.of(2021,01,12,15,34,22))
-                .startTime(LocalDateTime.of(2021, 01, 12, 13, 45, 32))
-                .id(6L)
-                .severity(1)
-                .build();
-
-        assetDetails1.add(assetDetail4);
-        assetDetails1.add(assetDetail5);
-        assetDetails1.add(assetDetail6);
-
-        asset2.setAssetDetails(assetDetails1);
-        assetMapService.save(asset2);
-
-        //Getting the assetName required to asset Statistics functions
-        String assetName1 = assetMapService.findById(1L).getAssetName();
-
-        //Assigning Statistics to attributes of AssetStats class
-        AssetStats assetStats1 = AssetStats.builder().assetName(assetName1).id(1L)
-                .noOfIncidents(assetMapService.totalIncidentsOfAsset(assetName1))
-                .rating(assetMapService.calculateRating(assetName1))
-                .totalUpTime(assetMapService.totalUptimeForAsset(assetName1))
-                .build();
-
-        //Repeating above for asset2.
-        String assetName2 = assetMapService.findById(2L).getAssetName();
-
-        AssetStats assetStats2 = AssetStats.builder().assetName(assetName2).id(2L)
-                .noOfIncidents(assetMapService.totalIncidentsOfAsset(assetName2))
-                .rating(assetMapService.calculateRating(assetName2))
-                .totalUpTime(assetMapService.totalUptimeForAsset(assetName2))
-                .build();
-
-        List<AssetStats> listAssetStats = Arrays.asList(assetStats1, assetStats2);
-Writing the Statistics to an Output Csv File.
-*/
         String line = "";
-        String filePath = "C:\\Users\\Administrator\\Documents\\TCS ING Training\\Spring Framework\\Asset_Tracking_Management-master\\src\\main\\java\\garg\\digaant\\Asset_Management\\Input.csv";
+        String filePath = "C:\\Users\\Administrator\\Documents\\TCS ING Training\\Spring Framework\\Asset_Tracking_Spring-01\\src\\main\\java\\garg\\digaant\\Asset_Management\\Input.csv";
         BufferedReader fileReader = null;
         List<AssetDetail> assetDetails = new ArrayList<AssetDetail>();
         try {
@@ -210,8 +118,8 @@ Writing the Statistics to an Output Csv File.
             listAssetStats.add(AssetStats.builder().id(asset.getId())
                     .assetName(asset.getAssetName())
                     .noOfIncidents(assetMapService.totalIncidentsOfAsset(asset.getAssetName()))
-                    .totalUpTime(assetMapService.totalIncidentsOfAsset(asset.getAssetName()))
-                    .rating(assetMapService.totalIncidentsOfAsset(asset.getAssetName()))
+                    .totalUpTime(assetMapService.totalUptimeForAsset(asset.getAssetName()))
+                    .rating(assetMapService.calculateRating(asset.getAssetName()))
                     .build());
         }
 
