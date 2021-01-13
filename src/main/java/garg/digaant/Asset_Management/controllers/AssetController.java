@@ -62,19 +62,19 @@ public class AssetController {
         String line = "";
         String filePath = "C:\\Users\\Administrator\\Documents\\TCS ING Training\\Spring Framework\\Asset_Tracking_Spring-01\\src\\main\\java\\garg\\digaant\\Asset_Management\\Input.csv";
         BufferedReader fileReader = null;
-        List<AssetDetail> assetDetails = new ArrayList<AssetDetail>();
+        List<AssetDetail> assetDetails = new ArrayList<AssetDetail>();//List of all asset instances
         try {
             fileReader = new BufferedReader(new FileReader(filePath));
 
-            while ((line = fileReader.readLine()) != null) {
+            while ((line = fileReader.readLine()) != null) {/*Reading in input file*/
                 Long assetDetailId = 1L;
-                String[] values = line.split(",");
+                String[] values = line.split(",");//Saving all values in different columns Separated by comma.
                 AssetDetail assetInstance = AssetDetail.builder().id(assetDetailId).assetName(values[0])
                         .startTime(LocalDateTime.parse(values[1], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
                         .endTime(LocalDateTime.parse(values[2], DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")))
-                        .severity(Integer.valueOf(values[3])).build();
+                        .severity(Integer.valueOf(values[3])).build(); //adding instance as an assetDetail class object.
                 assetDetailId++;
-                assetDetails.add(assetInstance);
+                assetDetails.add(assetInstance);//adding assetDetail class object to assetDetails
             }
 
         } catch (FileNotFoundException e) {
@@ -82,28 +82,28 @@ public class AssetController {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Set<Asset> assets = assetMapService.findAll();
+        Set<Asset> assets = assetMapService.findAll(); //Getting all assets saved in our service.
         Long assetId = 1L;
-        for (AssetDetail assetDetail : assetDetails){
+        for (AssetDetail assetDetail : assetDetails){//Going through each asset Detail and allocating it to respective asset.
 
-            if(assets.isEmpty()){
+            if(assets.isEmpty()){//if there are no assets existing creating a new one.
                 Asset asset = Asset.builder().id(assetId).assetName(assetDetail.getAssetName()).build();
-                asset.getAssetDetails().add(assetDetail);
-                assetDetail.setAsset(asset);
-                assetMapService.save(asset);
-                assets.add(asset);
-                assetId++;
+                asset.getAssetDetails().add(assetDetail);//Adding assetDetail to asset.
+                assetDetail.setAsset(asset);//Mapping asset to assetDetail.
+                assetMapService.save(asset);//Save asset in service.
+                assets.add(asset);//add assets to asset list
+                assetId++;//Increase AssetId
             }
             else{
-                int flag = 0;
+                int flag = 0;//flag to check whether asset with AssetName already exists.
                 for (Asset asset: assets) {
                     if (asset.getAssetName().equals(assetDetail.getAssetName())){
-                        asset.getAssetDetails().add(assetDetail);
-                        assetDetail.setAsset(asset);
-                        flag = 1;
+                        asset.getAssetDetails().add(assetDetail);//If asset with AssetName found, add detail to it.
+                        assetDetail.setAsset(asset);//Mapping asset to assetDetail.
+                        flag = 1;//asset with assetName found.
                     }
                 }
-                if(flag==0){
+                if(flag==0){//asset with assetName not found. Creating a new asset object with assetName.
                     Asset asset = Asset.builder().id(assetId).assetName(assetDetail.getAssetName()).build();
                     asset.getAssetDetails().add(assetDetail);
                     assets.add(asset);
@@ -113,7 +113,7 @@ public class AssetController {
                 }
             }
         }
-        List<AssetStats> listAssetStats = new ArrayList<AssetStats>();
+        List<AssetStats> listAssetStats = new ArrayList<AssetStats>();//Creating a list of Statistics for each Asset.
         for (Asset asset : assets) {
             listAssetStats.add(AssetStats.builder().id(asset.getId())
                     .assetName(asset.getAssetName())
@@ -123,6 +123,7 @@ public class AssetController {
                     .build());
         }
 
+        //Writing to the CSV output file.
         ICsvBeanWriter csvWriter = new CsvBeanWriter(response.getWriter(),
                 CsvPreference.STANDARD_PREFERENCE);
 
