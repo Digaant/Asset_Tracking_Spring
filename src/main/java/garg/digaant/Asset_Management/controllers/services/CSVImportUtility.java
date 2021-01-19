@@ -1,10 +1,8 @@
 package garg.digaant.Asset_Management.controllers.services;
-
 import garg.digaant.Asset_Management.maps.AssetMapService;
 import garg.digaant.Asset_Management.models.Asset;
 import garg.digaant.Asset_Management.models.AssetDetail;
 import garg.digaant.Asset_Management.models.AssetStats;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
 
@@ -20,10 +18,8 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-
 @Service
 @Component
-@Configuration
 public class CSVImportUtility {
     private AssetMapService assetMapService;
     public CSVImportUtility(AssetMapService assetMapService)
