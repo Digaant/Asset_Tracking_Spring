@@ -1,4 +1,4 @@
-package garg.digaant.Asset_Management.services;
+package garg.digaant.Asset_Management.repositories;
 
 import garg.digaant.Asset_Management.models.BasicEntity;
 

@@ -1,50 +1,50 @@
 package garg.digaant.Asset_Management.maps;
 
 import garg.digaant.Asset_Management.models.Asset;
-import garg.digaant.Asset_Management.models.AssetDetail;
-import garg.digaant.Asset_Management.services.AssetService;
 import org.springframework.stereotype.Service;
 
 import java.time.temporal.ChronoUnit;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 import static java.lang.Math.round;
 
 
 //Implements the AssetService interface
 @Service
-public class AssetMapService extends AbstractMapService<Asset, Long> implements AssetService {
+public class AssetMapService extends AbstractMapService<Asset, Long> implements garg.digaant.Asset_Management.repositories.AssetRepository {
 
     //Method to calculate the Total Incidents of a Particular Asset
     @Override
     public Long totalIncidentsOfAsset(String assetName) { /*Gets the assetName for which Incidents are to be calculated */
         Set<Asset> assets = this.findAll(); //Gets all the Assets
-        Long accessed = 0L;
-        for (Asset asset: assets) {
-            if(asset.getAssetName().equalsIgnoreCase(assetName)){ /*Looks for entered assetName*/
-                accessed = Long.valueOf(asset.getAssetDetails().size()); /*Returns Size of assetDetails(No of Incidents)*/
+        AtomicReference<Long> accessed = new AtomicReference<>();
+        assets.forEach(asset -> {
+            if (asset.getAssetName().equalsIgnoreCase(assetName)) { /*Looks for entered assetName*/
+                accessed.set(Long.valueOf(asset.getAssetDetails().size())); /*Returns Size of assetDetails(No of Incidents)*/
             }
-        }
-        return accessed;
+        });
+        return accessed.get();
     }
+
 
     @Override
     public double totalUptimeForAsset(String assetName) {
         Set<Asset> assets = this.findAll();
-        double totalUpTime = 0L;//Only includes severity 2 and 3 time.(Severity 1 is down time).
-        double totalSecsOfDay = 0L;// Includes time of all the severity.
-        for(Asset asset : assets){
+        AtomicReference<Double> totalUpTime = new AtomicReference<>((double) 0L);//Only includes severity 2 and 3 time.(Severity 1 is down time).
+        AtomicReference<Double> totalSecsOfDay = new AtomicReference<>((double) 0L);// Includes time of all the severity.
+        assets.forEach(asset -> {
             if(asset.getAssetName().equalsIgnoreCase(assetName)){
-                for (AssetDetail assetDetail : asset.getAssetDetails()) {/*For Each Asset Incident checks the severity
+                asset.getAssetDetails().forEach(assetDetail -> {/*For Each Asset Incident checks the severity
                     and adds accordingly*/
                     if(assetDetail.getSeverity() != 1){
-                        totalUpTime += ChronoUnit.SECONDS.between(assetDetail.getEndTime(), assetDetail.getStartTime());
+                        totalUpTime.updateAndGet(v -> v + ChronoUnit.SECONDS.between(assetDetail.getEndTime(), assetDetail.getStartTime()));
                     }
-                    totalSecsOfDay += ChronoUnit.SECONDS.between(assetDetail.getEndTime(), assetDetail.getStartTime());
-                }
+                    totalSecsOfDay.updateAndGet(v -> v + ChronoUnit.SECONDS.between(assetDetail.getEndTime(), assetDetail.getStartTime()));
+                });
             }
-        }
-        double upFraction = totalUpTime/totalSecsOfDay;
+        });
+        double upFraction = totalUpTime.get() / totalSecsOfDay.get();
         return round((upFraction) * 100);// Returns UpTime as a Percentage.
     }
 
@@ -52,21 +52,21 @@ public class AssetMapService extends AbstractMapService<Asset, Long> implements 
     public Long calculateRating(String assetName) {
         int sev1 = 30;//Severity 1 has rating of 30
         int sev2_3 = 10;//Severity 2 and 3 of 10
-        Long rating = 0L;
+        AtomicReference<Long> rating = new AtomicReference<>(0L);
 
         Set<Asset> assets = this.findALl();
-        for (Asset asset : assets) {
+        assets.forEach(asset -> {
             if(asset.getAssetName().equalsIgnoreCase(assetName)){
-                for (AssetDetail assetDetail : asset.getAssetDetails()) {/*Gets details of one Incident of the asset*/
+                asset.getAssetDetails().forEach(assetDetail -> {/*Gets details of one Incident of the asset*/
                     if(assetDetail.getSeverity() == 1){
-                        rating += sev1;
+                        rating.updateAndGet(v -> v + sev1);
                     }else if(assetDetail.getSeverity() == 2 || assetDetail.getSeverity() == 3){
-                        rating += sev2_3;
+                        rating.updateAndGet(v -> v + sev2_3);
                     }
-                }
+                });
             }
-        }
-        return rating;
+        });
+        return rating.get();
     }
 
     @Override
