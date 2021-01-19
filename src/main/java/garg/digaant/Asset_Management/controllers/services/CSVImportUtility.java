@@ -4,7 +4,6 @@ import garg.digaant.Asset_Management.maps.AssetMapService;
 import garg.digaant.Asset_Management.models.Asset;
 import garg.digaant.Asset_Management.models.AssetDetail;
 import garg.digaant.Asset_Management.models.AssetStats;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,18 +25,17 @@ import java.util.concurrent.atomic.AtomicReference;
 @Component
 @Configuration
 public class CSVImportUtility {
-
-    @Value("${filePath}")
-    private String filePath;
-
     private AssetMapService assetMapService;
     public CSVImportUtility(AssetMapService assetMapService)
-    {   this.assetMapService = assetMapService;}
-    public List<AssetDetail> readData(){
+    {  this.assetMapService = assetMapService; }
+    public List<AssetDetail> readData() throws IOException {
+        FileReader reader=new FileReader("C:\\Users\\Administrator\\Documents\\TCSINGTraining\\SpringFramework\\Asset_Tracking_Spring-01\\src\\main\\resources\\application.properties");
+        Properties p = new Properties();
+        p.load(reader);
         String line = "";
         List<AssetDetail> assetDetails = new ArrayList<AssetDetail>();
         try {
-            BufferedReader fileReader = new BufferedReader(new FileReader(this.filePath));
+            BufferedReader fileReader = new BufferedReader(new FileReader(p.getProperty("CSVImportUtility.filePath")));
             while ((line = fileReader.readLine()) != null) {/*Reading in input file*/
                 Long assetDetailId = 1L;
                 String[] values = line.split(",");//Saving all values in different columns Separated by comma.
